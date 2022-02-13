@@ -1,8 +1,9 @@
+import 'package:bill_creator/Pages/Invoice.dart';
 import 'package:flutter/material.dart';
 
 void main() {
   runApp(const MaterialApp(
-    home: App(),
+    home: Invoice(),
   ));
 }
 
