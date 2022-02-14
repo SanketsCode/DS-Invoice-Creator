@@ -26,7 +26,7 @@ class _InvoiceState extends State<Invoice> {
   final Bill_content_value = TextEditingController();
   final invoice_no = TextEditingController();
   final Bill_Total_amount = TextEditingController();
-  String Bill_content_name = 'मुरुम';
+  String Bill_content_name = 'Test';
   DateTime _dateTime = DateTime.now();
 
   @override
@@ -41,8 +41,16 @@ class _InvoiceState extends State<Invoice> {
                       if(Bill_user_name.text == '' || Bill_user_address.text == '' || Bill_user_Contact.text == ''  || Bill_content_value.text == null || invoice_no.text == null || Bill_Total_amount == null  ){
                         showAlertDialog(context);
                       }else{
-                        _createPDF(Bill_user_name.text,Bill_user_address.text,Bill_user_Contact.text,Bill_content_name,Bill_content_value.text,invoice_no.text,Bill_Total_amount.text);
+                        _createPDF(Bill_user_name.text,Bill_user_address.text,Bill_user_Contact.text,Bill_content_name,Bill_content_value.text,invoice_no.text,Bill_Total_amount.text,_dateTime);
                       }
+
+                      Bill_user_name.text='';
+                      Bill_user_address.text='';
+                      Bill_user_Contact.text='';
+                      Bill_content_value.text='';
+                      invoice_no.text = '';
+                      Bill_Total_amount.text ='';
+                      Bill_content_name='';
 
 
                     },
@@ -59,7 +67,7 @@ class _InvoiceState extends State<Invoice> {
                     controller: Bill_user_name,
                     decoration: const InputDecoration(
                         hintText: "नाव",
-                        labelText: "बिल धारक नाव :",
+                        labelText: "बिल धारक नाव : (Name)",
                         labelStyle:
                             TextStyle(fontSize: 19, color: Colors.black),
                         border: OutlineInputBorder()),
@@ -72,7 +80,7 @@ class _InvoiceState extends State<Invoice> {
                     controller: Bill_user_address,
                     decoration: const InputDecoration(
                         hintText: "पत्ता",
-                        labelText: "बिल धारक पत्ता :",
+                        labelText: "बिल धारक पत्ता : (Address)",
                         labelStyle:
                             TextStyle(fontSize: 19, color: Colors.black),
                         border: OutlineInputBorder()),
@@ -86,7 +94,7 @@ class _InvoiceState extends State<Invoice> {
                     controller: Bill_user_Contact,
                     decoration: const InputDecoration(
                         hintText: "मोबाईल नंबर",
-                        labelText: "बिल धारक मोबाईल नंबर :",
+                        labelText: "बिल धारक मोबाईल नंबर : ( Mobile No )",
                         labelStyle:
                             TextStyle(fontSize: 19, color: Colors.black),
                         border: OutlineInputBorder()),
@@ -102,7 +110,7 @@ class _InvoiceState extends State<Invoice> {
                         borderRadius: BorderRadius.circular(4)),
                     child: DropdownButton(
                         value: Bill_content_name,
-                        items: <String>['शेणखत', 'मुरुम', 'खडी']
+                        items: <String>['Fertilizer', 'Test', 'Test1']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -128,7 +136,7 @@ class _InvoiceState extends State<Invoice> {
                     controller: Bill_content_value,
                     decoration: const InputDecoration(
                         hintText: "क्रमांक",
-                        labelText: "साहित्य क्रमांक:",
+                        labelText: "साहित्य क्रमांक: (Quantity)",
                         labelStyle:
                             TextStyle(fontSize: 19, color: Colors.black),
                         border: OutlineInputBorder()),
@@ -156,7 +164,7 @@ class _InvoiceState extends State<Invoice> {
                     controller: Bill_Total_amount,
                     decoration: const InputDecoration(
                         hintText: "एकूण किंमत",
-                        labelText: "₹ एकूण किंमत",
+                        labelText: "₹ एकूण किंमत ( Total )",
                         labelStyle:
                         TextStyle(fontSize: 19, color: Colors.black),
                         border: OutlineInputBorder()),
@@ -176,7 +184,7 @@ class _InvoiceState extends State<Invoice> {
                       })
                     });
                   },
-                  child: Text('तारीख बदला'),
+                  child: Text('तारीख बदला ( Change Date )'),
                 ),
                 )
               ],
@@ -197,8 +205,8 @@ showAlertDialog(BuildContext context) {
 
   // set up the AlertDialog
   AlertDialog alert = AlertDialog(
-    title: Text("My title"),
-    content: Text("This is my message."),
+    title: Text("Warning"),
+    content: Text("Please fill all required fields"),
     actions: [
       okButton,
     ],
@@ -213,7 +221,7 @@ showAlertDialog(BuildContext context) {
   );
 }
 
- Future<void> _createPDF(String Bill_user_name ,String Bill_user_address,String Bill_user_Contact,String Bill_content_name,String Bill_content_value,String invoice_no ,String Bill_Total_amount) async{
+ Future<void> _createPDF(String BillUserName ,String BillUserAddress,String BillUserContact,String BillContentName,String BillContentValue,String invoiceNo ,String BillTotalAmount,  DateTime dateTime) async{
   // Create a new PDF document.
    final PdfDocument document = PdfDocument();
    //Add page to the PDF
@@ -225,14 +233,28 @@ showAlertDialog(BuildContext context) {
        bounds: Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
        pen: PdfPen(PdfColor(142, 170, 219, 255)));
    //Generate PDF grid.
-   final PdfGrid grid = getGrid(Bill_content_name,Bill_content_value,Bill_Total_amount);
+   // final PdfGrid grid = getGrid(BillContentName,BillContentValue,BillTotalAmount);
    //Draw the header section by creating text element
-   final PdfLayoutResult result = drawHeader(page, pageSize, grid);
+   // final PdfLayoutResult result = drawHeader(page, pageSize, grid,BillUserName);
+   //Draw grid
+   // drawGrid(page, grid, result);
+   //Add invoice footer
+   // drawFooter(page, pageSize);
+   //Save the PDF document
+
+
+
+
+   //Draw PDF Text Element
+   final PdfGrid grid = getTheGrid(BillContentName,BillContentValue,BillTotalAmount);
+   final PdfLayoutResult result = drawPDFTextElement(page, pageSize,BillTotalAmount,BillUserName,BillUserAddress,BillUserContact,invoiceNo,dateTime);
+
    //Draw grid
    drawGrid(page, grid, result);
    //Add invoice footer
    drawFooter(page, pageSize);
-   //Save the PDF document
+
+
    final List<int> bytes = document.save();
    //Dispose the document.
    document.dispose();
