@@ -23,6 +23,9 @@ class _AppState extends State<App> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
+            Padding(padding: EdgeInsets.only(bottom: 9.0),
+              child: Image(image: AssetImage('assets/images/logo.png'),width: 50,height: 50,),
+            ),
             Padding(
               padding: EdgeInsets.only(bottom: 9.0),
               child: Text("दख्खन सप्लायर्स अपशिंगे",

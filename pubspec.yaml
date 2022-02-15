@@ -38,6 +38,7 @@ dependencies:
   path_provider: ^2.0.9
   open_file: ^3.2.1
   syncfusion_flutter_pdf: ^19.4.50-beta
+  http: ^0.13.4
 
 dev_dependencies:
   flutter_test:
@@ -62,8 +63,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/logo.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -80,7 +81,7 @@ flutter:
   fonts:
     - family: OpenSans
       fonts:
-        - asset: assets/open_sans.ttf
+        - asset: assets/fonts/open_sans.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

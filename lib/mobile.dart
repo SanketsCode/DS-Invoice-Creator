@@ -6,10 +6,12 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 // import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' show get;
 
 Future<void> saveAndLaunchFile(List<int> bytes,String fileName) async{
   final path= (await getExternalStorageDirectory())?.path;
@@ -18,13 +20,13 @@ Future<void> saveAndLaunchFile(List<int> bytes,String fileName) async{
   OpenFile.open('$path/$fileName');
 }
 
-PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalAmount,String BillUserName,String BillUserAddress,String BillUserContact,String invoiceNo,DateTime dateTime){
+PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalAmount,String BillUserName,String BillUserAddress,String BillUserContact,String invoiceNo,DateTime dateTime, PdfBitmap image) {
 
   //Create Header
 
   //Draw rectangle
   page.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(91, 126, 215, 255)),
+      brush: PdfSolidBrush(PdfColor(246, 158, 92, 1)),
       bounds: Rect.fromLTWH(0, 0, pageSize.width - 115, 90));
   //Draw string
   page.graphics.drawString(
@@ -37,13 +39,19 @@ PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalA
       bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 90),
       brush: PdfSolidBrush(PdfColor(65, 104, 205)));
 
-  page.graphics.drawString(r'RS.' + BillTotalAmount,
-      PdfStandardFont(PdfFontFamily.helvetica, 18),
-      bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 100),
-      brush: PdfBrushes.white,
-      format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle));
+  // page.graphics.drawString(r'RS.' + BillTotalAmount,
+  //     PdfStandardFont(PdfFontFamily.helvetica, 18),
+  //     bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 100),
+  //     brush: PdfBrushes.white,
+  //     format: PdfStringFormat(
+  //         alignment: PdfTextAlignment.center,
+  //         lineAlignment: PdfVerticalAlignment.middle));
+
+  // Uri myUri = Uri.parse('assets/images/logo.png');
+  // final Uint8List imageData = File.fromUri(myUri).readAsBytesSync();
+
+  // String base64 = CryptoUtils.bytesToBase64(bytes);
+  page.graphics.drawImage(image, Rect.fromLTWH(400, 0, pageSize.width - 400, 100));
 
   //Draw string
   page.graphics.drawString('Amount', PdfStandardFont(PdfFontFamily.helvetica, 9),
@@ -62,7 +70,7 @@ PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalA
 
   String address = '''Bill To: \n Name : $BillUserName,\n Address : - $BillUserAddress,\n Phone no : + 91 $BillUserContact''';
 
-  final PdfFont contentFont = PdfStandardFont(PdfFontFamily.helvetica, 9);
+  final PdfFont contentFont = PdfStandardFont(PdfFontFamily.helvetica, 9,style: PdfFontStyle.bold);
   final Size contentSize = contentFont.measureString(invoiceNumber);
   PdfTextElement(text: invoiceNumber, font: contentFont).draw(
       page: page,
@@ -139,53 +147,6 @@ void drawFooter(PdfPage page, Size pageSize) async{
       bounds: Rect.fromLTWH(pageSize.width - 30, pageSize.height - 70, 0, 0));
 }
 
-//Create PDF grid and return
-PdfGrid getGrid(String BillContentName,String BillContentValue,String BillTotal) {
-  //Create a PDF grid
-  final PdfGrid grid = PdfGrid();
-  //Secify the columns count to the grid.
-  grid.columns.add(count: 5);
-  //Create the header row of the grid.
-  final PdfGridRow headerRow = grid.headers.add(1)[0];
-  //Set style
-  headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(68, 114, 196));
-  headerRow.style.textBrush = PdfBrushes.white;
-  headerRow.cells[0].value = 'Index';
-  headerRow.cells[0].stringFormat.alignment = PdfTextAlignment.center;
-  headerRow.cells[1].value = 'Product Name';
-  headerRow.cells[2].value = 'Price';
-  headerRow.cells[3].value = 'Quantity';
-  headerRow.cells[4].value = 'Total';
-
-  final double Price = (int.parse(BillTotal) / int.parse(BillContentValue));
-  //Add rows
-  addProducts('1', BillContentName, Price, int.parse(BillContentValue), double.parse(BillTotal), grid);
-  // addProducts('LJ-0192', 'Long-Sleeve Logo Jersey,M', 49.99, 3, 149.97, grid);
-  // addProducts('So-B909-M', 'Mountain Bike Socks,M', 9.5, 2, 19, grid);
-  // addProducts('LJ-0192', 'Long-Sleeve Logo Jersey,M', 49.99, 4, 199.96, grid);
-  // addProducts('FK-5136', 'ML Fork', 175.49, 6, 1052.94, grid);
-  // addProducts('HL-U509', 'Sports-100 Helmet,Black', 34.99, 1, 34.99, grid);
-  //Apply the table built-in style
-  grid.applyBuiltInStyle(PdfGridBuiltInStyle.listTable4Accent5);
-  //Set gird columns width
-  grid.columns[1].width = 200;
-  for (int i = 0; i < headerRow.cells.count; i++) {
-    headerRow.cells[i].style.cellPadding =
-        PdfPaddings(bottom: 5, left: 5, right: 5, top: 5);
-  }
-  for (int i = 0; i < grid.rows.count; i++) {
-    final PdfGridRow row = grid.rows[i];
-    for (int j = 0; j < row.cells.count; j++) {
-      final PdfGridCell cell = row.cells[j];
-      if (j == 0) {
-        cell.stringFormat.alignment = PdfTextAlignment.center;
-      }
-      cell.style.cellPadding =
-          PdfPaddings(bottom: 5, left: 5, right: 5, top: 5);
-    }
-  }
-  return grid;
-}
 
 //Create and row for the grid.
 void addProducts(String productId, String productName, double price,
@@ -244,4 +205,29 @@ double getTotalAmount(PdfGrid grid) {
   return total;
 }
 
+// Future<Uint8List> _readFileByte(String filePath) async {
+//   Uri myUri = Uri.parse(filePath);
+//   File audioFile = new File.fromUri(myUri);
+//   Uint8List bytes ;
+//   await audioFile.readAsBytes().then((value) {
+//     bytes = Uint8List.fromList(value);
+//     print('reading of bytes is completed');
+//   }).catchError((onError) {
+//     print('Exception Error while reading audio from path:' +
+//         onError.toString());
+//   });
+//   return bytes;
+// }
 
+
+//get the imgae
+
+Future<Uint8List> getTheImage() async{
+  var url =
+      "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg";
+  var response = await get(Uri.parse(url));
+  var data = response.bodyBytes;
+
+
+  return data;
+}

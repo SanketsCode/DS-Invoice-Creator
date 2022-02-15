@@ -6,6 +6,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' show get;
 import 'package:path_provider/path_provider.dart';
 // import 'package:pdf/pdf.dart';
 // import 'package:pdf/widgets.dart' as pw;
@@ -50,7 +51,7 @@ class _InvoiceState extends State<Invoice> {
                       Bill_content_value.text='';
                       invoice_no.text = '';
                       Bill_Total_amount.text ='';
-                      Bill_content_name='';
+                      // Bill_content_name='';
 
 
                     },
@@ -231,7 +232,7 @@ showAlertDialog(BuildContext context) {
    //Draw rectangle
    page.graphics.drawRectangle(
        bounds: Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
-       pen: PdfPen(PdfColor(142, 170, 219, 255)));
+       pen: PdfPen(PdfColor(240, 213, 129, 8)));
    //Generate PDF grid.
    // final PdfGrid grid = getGrid(BillContentName,BillContentValue,BillTotalAmount);
    //Draw the header section by creating text element
@@ -242,12 +243,24 @@ showAlertDialog(BuildContext context) {
    // drawFooter(page, pageSize);
    //Save the PDF document
 
+   //Read the image data from the weblink.
+   var url =
+       "https://www.kindpng.com/picc/m/140-1406274_new-holland-tractor-3630-hd-png-download.png";
+   var response = await get(Uri.parse(url));
+   var data = response.bodyBytes;
+   PdfBitmap image = PdfBitmap(data);
+
+
+    //Read Image
+  // final Uint8List imageData = File('logo.png').readAsBytesSync();
+   //final PdfBitmap image = PdfBitmap(imageData);
+
 
 
 
    //Draw PDF Text Element
    final PdfGrid grid = getTheGrid(BillContentName,BillContentValue,BillTotalAmount);
-   final PdfLayoutResult result = drawPDFTextElement(page, pageSize,BillTotalAmount,BillUserName,BillUserAddress,BillUserContact,invoiceNo,dateTime);
+   final PdfLayoutResult result = drawPDFTextElement(page, pageSize,BillTotalAmount,BillUserName,BillUserAddress,BillUserContact,invoiceNo,dateTime,image);
 
    //Draw grid
    drawGrid(page, grid, result);
