@@ -20,7 +20,7 @@ Future<void> saveAndLaunchFile(List<int> bytes,String fileName) async{
   OpenFile.open('$path/$fileName');
 }
 
-PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalAmount,String BillUserName,String BillUserAddress,String BillUserContact,String invoiceNo,DateTime dateTime, PdfBitmap image) {
+PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalAmount,String BillUserName,String BillUserAddress,String BillUserContact,String invoiceNo,DateTime dateTime) {
 
   //Create Header
 
@@ -36,25 +36,25 @@ PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalA
       format: PdfStringFormat(lineAlignment: PdfVerticalAlignment.middle));
 
   page.graphics.drawRectangle(
-      bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 90),
+      bounds: Rect.fromLTWH(400, 0, pageSize.width - 300, 90),
       brush: PdfSolidBrush(PdfColor(65, 104, 205)));
 
-  // page.graphics.drawString(r'RS.' + BillTotalAmount,
-  //     PdfStandardFont(PdfFontFamily.helvetica, 18),
-  //     bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 100),
-  //     brush: PdfBrushes.white,
-  //     format: PdfStringFormat(
-  //         alignment: PdfTextAlignment.center,
-  //         lineAlignment: PdfVerticalAlignment.middle));
+  page.graphics.drawString(r'Rs.' + BillTotalAmount,
+      PdfStandardFont(PdfFontFamily.helvetica, 18),
+      bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 100),
+      brush: PdfBrushes.white,
+      format: PdfStringFormat(
+          alignment: PdfTextAlignment.center,
+          lineAlignment: PdfVerticalAlignment.middle));
 
   // Uri myUri = Uri.parse('assets/images/logo.png');
   // final Uint8List imageData = File.fromUri(myUri).readAsBytesSync();
 
   // String base64 = CryptoUtils.bytesToBase64(bytes);
-  page.graphics.drawImage(image, Rect.fromLTWH(400, 0, pageSize.width - 400, 100));
+  // page.graphics.drawImage(image, Rect.fromLTWH(400, 0, pageSize.width - 400, 100));
 
   //Draw string
-  page.graphics.drawString('Amount', PdfStandardFont(PdfFontFamily.helvetica, 9),
+  page.graphics.drawString('Amount', PdfStandardFont(PdfFontFamily.helvetica, 12),
       brush: PdfBrushes.white,
       bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 33),
       format: PdfStringFormat(
@@ -65,17 +65,29 @@ PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalA
 
 
   final String invoiceNumber =
-      'Invoice Number: $invoiceNo\r\n\r\nDate: ${format.format(dateTime)}';
+      'Invoice Number: $invoiceNo\nDate: ${format.format(dateTime)}';
 
 
-  String address = '''Bill To: \n Name : $BillUserName,\n Address : - $BillUserAddress,\n Phone no : + 91 $BillUserContact''';
+  String address = '''Bill To: \nName : $BillUserName,\nAddress : $BillUserAddress,\nPhone no : + 91 $BillUserContact \r\n\r\n\r\n\r\nPay To - \nBank Name: HDFC BANK, DHANGARWADI\nBank Account no : 50100272967118\nBank IFSC code : HDFC0004850\nAccount Holder Name : Vaibhav Popat Tate\r\n\r\n''';
 
-  final PdfFont contentFont = PdfStandardFont(PdfFontFamily.helvetica, 9,style: PdfFontStyle.bold);
+  final PdfFont contentFont = PdfStandardFont(PdfFontFamily.helvetica, 12,style: PdfFontStyle.regular);
   final Size contentSize = contentFont.measureString(invoiceNumber);
   PdfTextElement(text: invoiceNumber, font: contentFont).draw(
       page: page,
       bounds: Rect.fromLTWH(pageSize.width - (contentSize.width + 30), 120,
           contentSize.width + 30, pageSize.height - 120));
+  //
+  // const String Pay = '\r\n\r\n\r\n\r\nPay To - \nBank Name: HDFC BANK,DHANGARWADI '
+  //     '\nBank Account no: 50100272967118 '
+  //     '\nBank IFSC code:HDFC0004850 '
+  //     '\nAccount Holder Name:Vaibhav Popat Tate\r\n\r\n';
+  //
+  //
+  //
+  // PdfTextElement(text: Pay, font: contentFont).draw(
+  //     page: page,
+  //     bounds: Rect.fromLTWH(30, 320,
+  //         pageSize.width - (contentSize.width + 60), pageSize.height - 80));
 
   return PdfTextElement(text: address, font: contentFont).draw(
       page: page,
@@ -90,6 +102,8 @@ PdfGrid getTheGrid(String BillContentName,String BillContentValue,String BillTot
   //Set style
   headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(68, 114, 196));
   headerRow.style.textBrush = PdfBrushes.white;
+  headerRow.style.font =
+      PdfStandardFont(PdfFontFamily.helvetica, 13, style: PdfFontStyle.bold);
   headerRow.cells[0].value = 'Index';
   headerRow.cells[0].stringFormat.alignment = PdfTextAlignment.center;
   headerRow.cells[1].value = 'Product Name';
@@ -99,7 +113,7 @@ PdfGrid getTheGrid(String BillContentName,String BillContentValue,String BillTot
 
   final double Price = (int.parse(BillTotal) / int.parse(BillContentValue));
   //Add rows
-  addProducts('1', BillContentName, Price, int.parse(BillContentValue), double.parse(BillTotal), grid);
+  addProducts('1', BillContentName, double.parse(Price.toStringAsFixed(2)), int.parse(BillContentValue), double.parse(BillTotal), grid);
   //Apply the table built-in style
   grid.applyBuiltInStyle(PdfGridBuiltInStyle.listTable4Accent5);
   //Set gird columns width
@@ -119,6 +133,10 @@ PdfGrid getTheGrid(String BillContentName,String BillContentValue,String BillTot
           PdfPaddings(bottom: 5, left: 5, right: 5, top: 5);
     }
   }
+
+
+  grid.style.font = PdfStandardFont(PdfFontFamily.helvetica, 13,style: PdfFontStyle.regular);
+
   return grid;
 }
 
@@ -137,8 +155,8 @@ void drawFooter(PdfPage page, Size pageSize) async{
 
   const String footerContent =
   // ignore: leading_newlines_in_multiline_strings
-  '''Dakhan Supplier Upsinge.\r\n\r\nAt Post Apshinge tal koregoan Dist Satara.,
-         Phone No - 8208553219\r\n\r\nAny Questions? support@adventure-works.com''';
+  '''Dakhan Supplier Upsinge.\nAt Post Apshinge tal koregoan Dist Satara.,
+         Phone No - 8208553219\nAny Questions? vaibhavtate002@gmail.com''';
 
   //Added 30 as a margin for the layout
   page.graphics.drawString(
@@ -174,23 +192,25 @@ void drawGrid(PdfPage page, PdfGrid grid, PdfLayoutResult result) {
   };
   //Draw the PDF grid and get the result.
   result = grid.draw(
-      page: page, bounds: Rect.fromLTWH(0, result.bounds.bottom + 40, 0, 0))!;
+      page: page, bounds: Rect.fromLTWH(0, 320 , 0, 0))!;
 
   //Draw grand total.
-  page.graphics.drawString('Grand Total',
-      PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.bold),
+  page.graphics.drawString('Grand Total : ',
+      PdfStandardFont(PdfFontFamily.helvetica, 15, style: PdfFontStyle.bold),
       bounds: Rect.fromLTWH(
-          quantityCellBounds!.left,
+          300,
           result.bounds.bottom + 10,
-          quantityCellBounds!.width,
+          200,
           quantityCellBounds!.height));
-  page.graphics.drawString(getTotalAmount(grid).toString(),
-      PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.bold),
+  page.graphics.drawString(getTotalAmount(grid).toString() + ' ',
+      PdfStandardFont(PdfFontFamily.helvetica, 15 , style: PdfFontStyle.bold),
       bounds: Rect.fromLTWH(
           totalPriceCellBounds!.left,
           result.bounds.bottom + 10,
-          totalPriceCellBounds!.width,
+          300,
           totalPriceCellBounds!.height));
+
+
 }
 
 
@@ -205,29 +225,3 @@ double getTotalAmount(PdfGrid grid) {
   return total;
 }
 
-// Future<Uint8List> _readFileByte(String filePath) async {
-//   Uri myUri = Uri.parse(filePath);
-//   File audioFile = new File.fromUri(myUri);
-//   Uint8List bytes ;
-//   await audioFile.readAsBytes().then((value) {
-//     bytes = Uint8List.fromList(value);
-//     print('reading of bytes is completed');
-//   }).catchError((onError) {
-//     print('Exception Error while reading audio from path:' +
-//         onError.toString());
-//   });
-//   return bytes;
-// }
-
-
-//get the imgae
-
-Future<Uint8List> getTheImage() async{
-  var url =
-      "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg";
-  var response = await get(Uri.parse(url));
-  var data = response.bodyBytes;
-
-
-  return data;
-}

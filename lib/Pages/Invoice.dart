@@ -244,11 +244,11 @@ showAlertDialog(BuildContext context) {
    //Save the PDF document
 
    //Read the image data from the weblink.
-   var url =
-       "https://www.kindpng.com/picc/m/140-1406274_new-holland-tractor-3630-hd-png-download.png";
-   var response = await get(Uri.parse(url));
-   var data = response.bodyBytes;
-   PdfBitmap image = PdfBitmap(data);
+   // var url =
+   //     "https://www.kindpng.com/picc/m/140-1406274_new-holland-tractor-3630-hd-png-download.png";
+   // var response = await get(Uri.parse(url));
+   // var data = response.bodyBytes;
+   // PdfBitmap image = PdfBitmap(data);
 
 
     //Read Image
@@ -260,7 +260,7 @@ showAlertDialog(BuildContext context) {
 
    //Draw PDF Text Element
    final PdfGrid grid = getTheGrid(BillContentName,BillContentValue,BillTotalAmount);
-   final PdfLayoutResult result = drawPDFTextElement(page, pageSize,BillTotalAmount,BillUserName,BillUserAddress,BillUserContact,invoiceNo,dateTime,image);
+   final PdfLayoutResult result = drawPDFTextElement(page, pageSize,BillTotalAmount,BillUserName,BillUserAddress,BillUserContact,invoiceNo,dateTime);
 
    //Draw grid
    drawGrid(page, grid, result);
