@@ -26,26 +26,31 @@ PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalA
 
   //Draw rectangle
   page.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(246, 158, 92, 1)),
+      brush: PdfSolidBrush(PdfColor(0, 0, 0, 0)),
       bounds: Rect.fromLTWH(0, 0, pageSize.width - 115, 90));
   //Draw string
   page.graphics.drawString(
       'INVOICE BILL', PdfStandardFont(PdfFontFamily.helvetica, 30),
-      brush: PdfBrushes.white,
+      brush: PdfBrushes.black,
       bounds: Rect.fromLTWH(25, 0, pageSize.width - 115, 90),
       format: PdfStringFormat(lineAlignment: PdfVerticalAlignment.middle));
 
-  page.graphics.drawRectangle(
-      bounds: Rect.fromLTWH(400, 0, pageSize.width - 300, 90),
-      brush: PdfSolidBrush(PdfColor(65, 104, 205)));
+  // page.graphics.drawRectangle(
+  //     bounds: Rect.fromLTWH(400, 0, pageSize.width - 300, 90),
+  //     brush: PdfSolidBrush(PdfColor(0,0,0,0)));
 
-  page.graphics.drawString(r'Rs.' + BillTotalAmount,
-      PdfStandardFont(PdfFontFamily.helvetica, 18),
-      bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 100),
-      brush: PdfBrushes.white,
-      format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle));
+  page.graphics.drawLine(PdfPens.black, Offset(520, 200), Offset(0, 200));
+  page.graphics.drawLine(PdfPens.black, Offset(520, 203), Offset(0, 203));
+  page.graphics.drawLine(PdfPens.black, Offset(520, 90), Offset(0, 90));
+  page.graphics.drawLine(PdfPens.black, Offset(520, 87), Offset(0, 87));
+
+  // page.graphics.drawString(r'Rs.' + BillTotalAmount,
+  //     PdfStandardFont(PdfFontFamily.helvetica, 18),
+  //     bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 100),
+  //     brush: PdfBrushes.black,
+  //     format: PdfStringFormat(
+  //         alignment: PdfTextAlignment.center,
+  //         lineAlignment: PdfVerticalAlignment.middle));
 
   // Uri myUri = Uri.parse('assets/images/logo.png');
   // final Uint8List imageData = File.fromUri(myUri).readAsBytesSync();
@@ -100,8 +105,8 @@ PdfGrid getTheGrid(String BillContentName,String BillContentValue,String BillTot
   grid.columns.add(count: 5);
   final PdfGridRow headerRow = grid.headers.add(1)[0];
   //Set style
-  headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(68, 114, 196));
-  headerRow.style.textBrush = PdfBrushes.white;
+  headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(248, 194, 115, 0));
+  headerRow.style.textBrush = PdfBrushes.black;
   headerRow.style.font =
       PdfStandardFont(PdfFontFamily.helvetica, 13, style: PdfFontStyle.bold);
   headerRow.cells[0].value = 'Index';
@@ -115,7 +120,7 @@ PdfGrid getTheGrid(String BillContentName,String BillContentValue,String BillTot
   //Add rows
   addProducts('1', BillContentName, double.parse(Price.toStringAsFixed(2)), int.parse(BillContentValue), double.parse(BillTotal), grid);
   //Apply the table built-in style
-  grid.applyBuiltInStyle(PdfGridBuiltInStyle.listTable4Accent5);
+  grid.applyBuiltInStyle(PdfGridBuiltInStyle.gridTable4);
   //Set gird columns width
   grid.columns[1].width = 200;
   for (int i = 0; i < headerRow.cells.count; i++) {
@@ -147,7 +152,7 @@ PdfGrid getTheGrid(String BillContentName,String BillContentValue,String BillTot
 void drawFooter(PdfPage page, Size pageSize) async{
 
   final PdfPen linePen =
-  PdfPen(PdfColor(142, 170, 219, 255), dashStyle: PdfDashStyle.custom);
+  PdfPen(PdfColor(0,0,0,0), dashStyle: PdfDashStyle.solid);
   linePen.dashPattern = <double>[3, 3];
   //Draw line
   page.graphics.drawLine(linePen, Offset(0, pageSize.height - 100),
@@ -192,7 +197,7 @@ void drawGrid(PdfPage page, PdfGrid grid, PdfLayoutResult result) {
   };
   //Draw the PDF grid and get the result.
   result = grid.draw(
-      page: page, bounds: Rect.fromLTWH(0, 320 , 0, 0))!;
+      page: page, bounds: const Rect.fromLTWH(0,320,0,0))!;
 
   //Draw grand total.
   page.graphics.drawString('Grand Total : ',

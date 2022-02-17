@@ -232,7 +232,10 @@ showAlertDialog(BuildContext context) {
    //Draw rectangle
    page.graphics.drawRectangle(
        bounds: Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
-       pen: PdfPen(PdfColor(240, 213, 129, 8)));
+       pen: PdfPen(PdfColor(1, 1, 1, 1)));
+   page.graphics.drawRectangle(
+       bounds: Rect.fromLTWH(2, 2, pageSize.width - 4, pageSize.height -4),
+       pen: PdfPen(PdfColor(1, 1, 1, 1)));
    //Generate PDF grid.
    // final PdfGrid grid = getGrid(BillContentName,BillContentValue,BillTotalAmount);
    //Draw the header section by creating text element
@@ -254,7 +257,6 @@ showAlertDialog(BuildContext context) {
     //Read Image
   // final Uint8List imageData = File('logo.png').readAsBytesSync();
    //final PdfBitmap image = PdfBitmap(imageData);
-
 
 
 
