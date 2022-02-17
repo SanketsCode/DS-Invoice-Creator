@@ -1,4 +1,5 @@
 // import 'package:flutter/cupertino.dart';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:bill_creator/mobile.dart';
@@ -27,7 +28,7 @@ class _InvoiceState extends State<Invoice> {
   final Bill_content_value = TextEditingController();
   final invoice_no = TextEditingController();
   final Bill_Total_amount = TextEditingController();
-  String Bill_content_name = 'Test';
+  String Bill_content_name = 'मुरुम';
   DateTime _dateTime = DateTime.now();
 
   @override
@@ -111,7 +112,7 @@ class _InvoiceState extends State<Invoice> {
                         borderRadius: BorderRadius.circular(4)),
                     child: DropdownButton(
                         value: Bill_content_name,
-                        items: <String>['Fertilizer', 'Test', 'Test1']
+                        items: <String>['शेणखत', 'मुरुम', 'खडी','वाळू']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -236,15 +237,18 @@ showAlertDialog(BuildContext context) {
    page.graphics.drawRectangle(
        bounds: Rect.fromLTWH(2, 2, pageSize.width - 4, pageSize.height -4),
        pen: PdfPen(PdfColor(1, 1, 1, 1)));
-   //Generate PDF grid.
-   // final PdfGrid grid = getGrid(BillContentName,BillContentValue,BillTotalAmount);
-   //Draw the header section by creating text element
-   // final PdfLayoutResult result = drawHeader(page, pageSize, grid,BillUserName);
-   //Draw grid
-   // drawGrid(page, grid, result);
-   //Add invoice footer
-   // drawFooter(page, pageSize);
-   //Save the PDF document
+
+   final path= (await getExternalStorageDirectory())?.path;
+   //Read font data.
+   final Uint8List fontData = File('$path/Poppins.ttf').readAsBytesSync();
+
+
+   //Read image data.
+   final Uint8List imageData = File('$path/text_red.png').readAsBytesSync();
+//Load the image using PdfBitmap.
+   final PdfBitmap image = PdfBitmap(imageData);
+//Create a PDF true type font object.
+//    final PdfFont font = PdfTrueTypeFont(fontData, 12);
 
    //Read the image data from the weblink.
    // var url =
@@ -255,19 +259,19 @@ showAlertDialog(BuildContext context) {
 
 
     //Read Image
-  // final Uint8List imageData = File('logo.png').readAsBytesSync();
-   //final PdfBitmap image = PdfBitmap(imageData);
+  final Uint8List logoData = File('$path/logo.png').readAsBytesSync();
+   final PdfBitmap logo = PdfBitmap(logoData);
 
 
 
    //Draw PDF Text Element
-   final PdfGrid grid = getTheGrid(BillContentName,BillContentValue,BillTotalAmount);
-   final PdfLayoutResult result = drawPDFTextElement(page, pageSize,BillTotalAmount,BillUserName,BillUserAddress,BillUserContact,invoiceNo,dateTime);
+   final PdfGrid grid = getTheGrid(BillContentName,BillContentValue,BillTotalAmount,fontData);
+   final PdfLayoutResult result = drawPDFTextElement(page, pageSize,BillTotalAmount,BillUserName,BillUserAddress,BillUserContact,invoiceNo,dateTime,fontData,image,logo);
 
    //Draw grid
-   drawGrid(page, grid, result);
+   drawGrid(page, grid, result,fontData);
    //Add invoice footer
-   drawFooter(page, pageSize);
+   // drawFooter(page, pageSize);
 
 
    final List<int> bytes = document.save();
