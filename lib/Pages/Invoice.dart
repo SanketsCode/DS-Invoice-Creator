@@ -5,15 +5,9 @@ import 'dart:typed_data';
 import 'package:bill_creator/mobile.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' show get;
 import 'package:path_provider/path_provider.dart';
-// import 'package:pdf/pdf.dart';
-// import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
-
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 class Invoice extends StatefulWidget {
   const Invoice({Key? key}) : super(key: key);
 
@@ -28,6 +22,7 @@ class _InvoiceState extends State<Invoice> {
   final Bill_content_value = TextEditingController();
   final invoice_no = TextEditingController();
   final Bill_Total_amount = TextEditingController();
+  final Receive_amount = TextEditingController();
   String Bill_content_name = 'मुरुम';
   DateTime _dateTime = DateTime.now();
 
@@ -40,10 +35,10 @@ class _InvoiceState extends State<Invoice> {
               actions: [
                 IconButton(
                     onPressed: () {
-                      if(Bill_user_name.text == '' || Bill_user_address.text == '' || Bill_user_Contact.text == ''  || Bill_content_value.text == null || invoice_no.text == null || Bill_Total_amount == null  ){
+                      if(Bill_user_name.text == '' || Bill_user_address.text == '' || Bill_user_Contact.text == ''  || Bill_content_value.text == null || invoice_no.text == null || Bill_Total_amount == null || Receive_amount.text == ''){
                         showAlertDialog(context);
                       }else{
-                        _createPDF(Bill_user_name.text,Bill_user_address.text,Bill_user_Contact.text,Bill_content_name,Bill_content_value.text,invoice_no.text,Bill_Total_amount.text,_dateTime);
+                        _createPDF(Bill_user_name.text,Bill_user_address.text,Bill_user_Contact.text,Bill_content_name,Bill_content_value.text,invoice_no.text,Bill_Total_amount.text,_dateTime,Receive_amount.text);
                       }
 
                       Bill_user_name.text='';
@@ -52,6 +47,7 @@ class _InvoiceState extends State<Invoice> {
                       Bill_content_value.text='';
                       invoice_no.text = '';
                       Bill_Total_amount.text ='';
+                      Receive_amount.text='';
                       // Bill_content_name='';
 
 
@@ -112,7 +108,7 @@ class _InvoiceState extends State<Invoice> {
                         borderRadius: BorderRadius.circular(4)),
                     child: DropdownButton(
                         value: Bill_content_name,
-                        items: <String>['शेणखत', 'मुरुम', 'खडी','वाळू']
+                        items: <String>['मुरुम', 'खडी','वाळू','माती','ग्रिट (Grit)','दगड','Crash Sand','Plaster Sand']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -172,6 +168,20 @@ class _InvoiceState extends State<Invoice> {
                         border: OutlineInputBorder()),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 8.0, right: 8.0, top: 15.0, bottom: 4.0),
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    controller: Receive_amount,
+                    decoration: const InputDecoration(
+                        hintText: "मिळालेला बॅलेन्स",
+                        labelText: "₹ Received Balance",
+                        labelStyle:
+                        TextStyle(fontSize: 19, color: Colors.black),
+                        border: OutlineInputBorder()),
+                  ),
+                ),
                 Padding(padding: const EdgeInsets.only(
                     left: 8.0, right: 8.0, top: 15.0, bottom: 4.0),
                    child: ElevatedButton(
@@ -223,7 +233,7 @@ showAlertDialog(BuildContext context) {
   );
 }
 
- Future<void> _createPDF(String BillUserName ,String BillUserAddress,String BillUserContact,String BillContentName,String BillContentValue,String invoiceNo ,String BillTotalAmount,  DateTime dateTime) async{
+ Future<void> _createPDF(String BillUserName ,String BillUserAddress,String BillUserContact,String BillContentName,String BillContentValue,String invoiceNo ,String BillTotalAmount,  DateTime dateTime,String Received_Balance) async{
   // Create a new PDF document.
    final PdfDocument document = PdfDocument();
    //Add page to the PDF
@@ -247,15 +257,7 @@ showAlertDialog(BuildContext context) {
    final Uint8List imageData = File('$path/text_red.png').readAsBytesSync();
 //Load the image using PdfBitmap.
    final PdfBitmap image = PdfBitmap(imageData);
-//Create a PDF true type font object.
-//    final PdfFont font = PdfTrueTypeFont(fontData, 12);
 
-   //Read the image data from the weblink.
-   // var url =
-   //     "https://www.kindpng.com/picc/m/140-1406274_new-holland-tractor-3630-hd-png-download.png";
-   // var response = await get(Uri.parse(url));
-   // var data = response.bodyBytes;
-   // PdfBitmap image = PdfBitmap(data);
 
 
     //Read Image
@@ -265,11 +267,11 @@ showAlertDialog(BuildContext context) {
 
 
    //Draw PDF Text Element
-   final PdfGrid grid = getTheGrid(BillContentName,BillContentValue,BillTotalAmount,fontData);
+   final PdfGrid grid = getTheGrid(BillContentName,BillContentValue,BillTotalAmount,fontData,Received_Balance);
    final PdfLayoutResult result = drawPDFTextElement(page, pageSize,BillTotalAmount,BillUserName,BillUserAddress,BillUserContact,invoiceNo,dateTime,fontData,image,logo);
 
    //Draw grid
-   drawGrid(page, grid, result,fontData);
+   drawGrid(page, grid, result,fontData,Received_Balance);
    //Add invoice footer
    // drawFooter(page, pageSize);
 

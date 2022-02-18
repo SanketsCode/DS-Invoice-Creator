@@ -1,17 +1,11 @@
-import 'dart:ffi';
 import 'dart:typed_data';
-
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-// import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-// import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:http/http.dart' show get;
+
 
 Future<void> saveAndLaunchFile(List<int> bytes,String fileName) async{
   final path= (await getExternalStorageDirectory())?.path;
@@ -22,21 +16,7 @@ Future<void> saveAndLaunchFile(List<int> bytes,String fileName) async{
 
 PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalAmount,String BillUserName,String BillUserAddress,String BillUserContact,String invoiceNo,DateTime dateTime,Uint8List fontData,PdfBitmap image,PdfBitmap logo) {
   final PdfFont font = PdfTrueTypeFont(fontData, 12);
-  //Create Header
 
-  //Draw rectangle
-  // page.graphics.drawRectangle(
-  //     brush: PdfSolidBrush(PdfColor(0, 0, 0, 0)),
-  //     bounds: Rect.fromLTWH(0, 0, pageSize.width - 115, 90));
-  //Draw string
-  // page.graphics.drawString(
-  //     'दख्खन सप्लायर्स अपशिंगे', font,
-  //     brush: PdfBrushes.black,
-  //     bounds: Rect.fromLTWH(25, 0, pageSize.width, 90),
-  //     format: PdfStringFormat(lineAlignment: PdfVerticalAlignment.middle,alignment: PdfTextAlignment.center));
-
-
-  
   page.graphics.drawImage(image, Rect.fromLTWH(10, 0, pageSize.width - 120, 70));
 
   const String details =
@@ -49,9 +29,6 @@ PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalA
       bounds: Rect.fromLTWH(25, 30, pageSize.width, 90),
       format: PdfStringFormat(lineAlignment: PdfVerticalAlignment.middle,alignment: PdfTextAlignment.left));
 
-  // page.graphics.drawRectangle(
-  //     bounds: Rect.fromLTWH(400, 0, pageSize.width - 300, 90),
-  //     brush: PdfSolidBrush(PdfColor(0,0,0,0)));
 
   page.graphics.drawImage(logo, Rect.fromLTWH(380, 0, pageSize.width - 400, 90));
 
@@ -59,35 +36,21 @@ PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalA
   page.graphics.drawLine(PdfPens.black, Offset(520, 253), Offset(0, 253));
   page.graphics.drawLine(PdfPens.black, Offset(520, 93), Offset(0, 93));
   page.graphics.drawLine(PdfPens.black, Offset(520, 90), Offset(0, 90));
-  page.graphics.drawLine(PdfPens.black, Offset(520, 420), Offset(0, 420));
-  page.graphics.drawLine(PdfPens.black, Offset(520, 423), Offset(0, 423));
-
-  // page.graphics.drawString(r'Rs.' + BillTotalAmount,
-  //     PdfStandardFont(PdfFontFamily.helvetica, 18),
-  //     bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 100),
-  //     brush: PdfBrushes.black,
-  //     format: PdfStringFormat(
-  //         alignment: PdfTextAlignment.center,
-  //         lineAlignment: PdfVerticalAlignment.middle));
+  page.graphics.drawLine(PdfPens.black, Offset(520, 397), Offset(0, 397));
+  page.graphics.drawLine(PdfPens.black, Offset(520, 440), Offset(0, 440));
+  page.graphics.drawLine(PdfPens.black, Offset(520, 443), Offset(0, 443));
 
 
-  // //Draw string
-  // page.graphics.drawString('Amount', PdfStandardFont(PdfFontFamily.helvetica, 12),
-  //     brush: PdfBrushes.white,
-  //     bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 33),
-  //     format: PdfStringFormat(
-  //         alignment: PdfTextAlignment.center,
-  //         lineAlignment: PdfVerticalAlignment.bottom));
   //Create data format and convert it to text.
   final DateFormat format = DateFormat.yMMMMd('en_US');
 
 
   final String invoiceNumber =
-      'Invoice Number: $invoiceNo\nDate: ${format.format(dateTime)}\n\nMobile No -  \n+91 8208553219\n+91 9765999189';
+      'Invoice Number: $invoiceNo\nDate: ${format.format(dateTime)}\n\nMobile No -  \n+91 8208553219\n+91 9309780761';
 
 
   String address = '''Bill To: \nName : $BillUserName,\nAddress : $BillUserAddress,\nPhone no : + 91 $BillUserContact ''';
-  String Payment = '''Account Details - \nBank Name: HDFC BANK, DHANGARWADI\nBank Account no : 50100272967118\nBank IFSC code : HDFC0004850\nAccount Holder Name : Vaibhav Popat Tate\r\n\r\n''';
+  String Payment = '''Account Details - \nBank Name: HDFC BANK, DHANGARWADI\nBank Account no : 50100272967118\nBank IFSC code : HDFC0004850dark\r\n\r\n''';
   // String mobile = '''Mobile No -  \n+91 8208553219\n+91 9765999189''';
   final PdfFont contentFont = font;
   final Size contentSize = contentFont.measureString(invoiceNumber);
@@ -95,30 +58,20 @@ PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalA
       page: page,
       bounds: Rect.fromLTWH(pageSize.width - (contentSize.width + 30), 120,
           contentSize.width + 30, pageSize.height - 120));
-  //
-  // const String Pay = '\r\n\r\n\r\n\r\nPay To - \nBank Name: HDFC BANK,DHANGARWADI '
-  //     '\nBank Account no: 50100272967118 '
-  //     '\nBank IFSC code:HDFC0004850 '
-  //     '\nAccount Holder Name:Vaibhav Popat Tate\r\n\r\n';
-  //
-  //
-  //
+
   PdfTextElement(text: Payment, font: contentFont).draw(
       page: page,
       bounds: Rect.fromLTWH(30, 500,
           pageSize.width - (contentSize.width + 60), pageSize.height - 80));
 
-  // PdfTextElement(text: mobile, font: contentFont).draw(
-  //     page: page,
-  //     bounds: Rect.fromLTWH(pageSize.width - (contentSize.width + 30), 480,
-  //         contentSize.width + 30, pageSize.height - 120));
+  //Working with another text widget
   return PdfTextElement(text: address, font: contentFont).draw(
       page: page,
       bounds: Rect.fromLTWH(30, 120,
           pageSize.width - (contentSize.width + 30), pageSize.height - 120))!;
 }
 
-PdfGrid getTheGrid(String BillContentName,String BillContentValue,String BillTotal,Uint8List fontData){
+PdfGrid getTheGrid(String BillContentName,String BillContentValue,String BillTotal,Uint8List fontData, String received_balance){
   final PdfFont font = PdfTrueTypeFont(fontData, 12);
   final PdfGrid grid = PdfGrid();
   grid.columns.add(count: 5);
@@ -201,7 +154,7 @@ void addProducts(String productId, String productName, double price,
 }
 
 //Draws the grid
-void drawGrid(PdfPage page, PdfGrid grid, PdfLayoutResult result,Uint8List fontData) {
+void drawGrid(PdfPage page, PdfGrid grid, PdfLayoutResult result,Uint8List fontData, String received_balance) {
   final PdfFont font = PdfTrueTypeFont(fontData, 15);
   Rect? totalPriceCellBounds;
   Rect? quantityCellBounds;
@@ -219,18 +172,34 @@ void drawGrid(PdfPage page, PdfGrid grid, PdfLayoutResult result,Uint8List fontD
       page: page, bounds: const Rect.fromLTWH(0,300,0,0))!;
 
   //Draw grand total.
+  page.graphics.drawString('Received Balance  : ',
+      PdfStandardFont(PdfFontFamily.helvetica, 15, style: PdfFontStyle.bold),
+      bounds: Rect.fromLTWH(
+          200,
+          result.bounds.bottom + 10,
+          200,
+          quantityCellBounds!.height));
+  page.graphics.drawString('₹ '+received_balance + ' ',
+      font,
+      bounds: Rect.fromLTWH(
+          totalPriceCellBounds!.left,
+          result.bounds.bottom + 10,
+          3500,
+          totalPriceCellBounds!.height));
+
+  //Draw grand total.
   page.graphics.drawString('Grand Total : ',
       PdfStandardFont(PdfFontFamily.helvetica, 15, style: PdfFontStyle.bold),
       bounds: Rect.fromLTWH(
-          300,
-          result.bounds.bottom + 10,
+          200,
+          result.bounds.bottom + 50,
           200,
           quantityCellBounds!.height));
   page.graphics.drawString('₹ '+getTotalAmount(grid).toString() + ' ',
       font,
       bounds: Rect.fromLTWH(
           totalPriceCellBounds!.left,
-          result.bounds.bottom + 10,
+          result.bounds.bottom + 50,
           3500,
           totalPriceCellBounds!.height));
 
