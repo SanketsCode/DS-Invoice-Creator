@@ -37,16 +37,19 @@ PdfLayoutResult drawPDFTextElement(PdfPage page, Size pageSize,String BillTotalA
   page.graphics.drawLine(PdfPens.black, Offset(520, 93), Offset(0, 93));
   page.graphics.drawLine(PdfPens.black, Offset(520, 90), Offset(0, 90));
   page.graphics.drawLine(PdfPens.black, Offset(520, 397), Offset(0, 397));
+  //line for payment method
   page.graphics.drawLine(PdfPens.black, Offset(520, 440), Offset(0, 440));
-  page.graphics.drawLine(PdfPens.black, Offset(520, 443), Offset(0, 443));
+  page.graphics.drawLine(PdfPens.black, Offset(520, 480), Offset(0, 480));
+  page.graphics.drawLine(PdfPens.black, Offset(520, 483), Offset(0, 483));
 
 
   //Create data format and convert it to text.
-  final DateFormat format = DateFormat.yMMMMd('en_US');
+  // final DateFormat format = DateFormat.yMMMMd('en_US');
+  String format = '${DateFormat('dd-MM-yyyy').format(dateTime)}\nTime: ${DateFormat('hh:mm a').format(dateTime)}';
 
 
   final String invoiceNumber =
-      'Invoice Number: $invoiceNo\nDate: ${format.format(dateTime)}\n\nMobile No -  \n+91 8208553219\n+91 9309780761';
+      'Invoice Number: $invoiceNo\nDate: ${format}\n\nMobile No -  \n+91 8208553219\n+91 9309780761';
 
 
   String address = '''Bill To: \nName : $BillUserName,\nAddress : $BillUserAddress,\nPhone no : + 91 $BillUserContact ''';
@@ -154,7 +157,7 @@ void addProducts(String productId, String productName, double price,
 }
 
 //Draws the grid
-void drawGrid(PdfPage page, PdfGrid grid, PdfLayoutResult result,Uint8List fontData, String received_balance) {
+void drawGrid(PdfPage page, PdfGrid grid, PdfLayoutResult result,Uint8List fontData, String received_balance, String payment_method) {
   final PdfFont font = PdfTrueTypeFont(fontData, 15);
   Rect? totalPriceCellBounds;
   Rect? quantityCellBounds;
@@ -184,6 +187,21 @@ void drawGrid(PdfPage page, PdfGrid grid, PdfLayoutResult result,Uint8List fontD
       bounds: Rect.fromLTWH(
           totalPriceCellBounds!.left,
           result.bounds.bottom + 10,
+          3500,
+          totalPriceCellBounds!.height));
+  //Draw grand total.
+  page.graphics.drawString('Payment Method : ',
+      PdfStandardFont(PdfFontFamily.helvetica, 15, style: PdfFontStyle.bold),
+      bounds: Rect.fromLTWH(
+          200,
+          result.bounds.bottom + 90,
+          200,
+          quantityCellBounds!.height));
+  page.graphics.drawString(payment_method,
+      font,
+      bounds: Rect.fromLTWH(
+          totalPriceCellBounds!.left,
+          result.bounds.bottom + 90,
           3500,
           totalPriceCellBounds!.height));
 

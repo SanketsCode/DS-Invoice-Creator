@@ -1,7 +1,7 @@
 // import 'package:flutter/cupertino.dart';
 import 'dart:math';
 import 'dart:typed_data';
-
+import 'package:intl/intl.dart';
 import 'package:bill_creator/mobile.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:flutter/material.dart';
@@ -20,11 +20,18 @@ class _InvoiceState extends State<Invoice> {
   final Bill_user_address = TextEditingController();
   final Bill_user_Contact = TextEditingController();
   final Bill_content_value = TextEditingController();
-  final invoice_no = TextEditingController();
+  late TextEditingController invoice_no;
   final Bill_Total_amount = TextEditingController();
   final Receive_amount = TextEditingController();
   String Bill_content_name = 'मुरुम';
+  String payment_method = 'Credit';
   DateTime _dateTime = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    invoice_no = new TextEditingController(text: '${DateFormat('ddMMyysshhmm').format(DateTime.now())}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +45,7 @@ class _InvoiceState extends State<Invoice> {
                       if(Bill_user_name.text == '' || Bill_user_address.text == '' || Bill_user_Contact.text == ''  || Bill_content_value.text == null || invoice_no.text == null || Bill_Total_amount == null || Receive_amount.text == ''){
                         showAlertDialog(context);
                       }else{
-                        _createPDF(Bill_user_name.text,Bill_user_address.text,Bill_user_Contact.text,Bill_content_name,Bill_content_value.text,invoice_no.text,Bill_Total_amount.text,_dateTime,Receive_amount.text);
+                        _createPDF(Bill_user_name.text,Bill_user_address.text,Bill_user_Contact.text,Bill_content_name,Bill_content_value.text,invoice_no.text,Bill_Total_amount.text,_dateTime,Receive_amount.text,payment_method);
                       }
 
                       Bill_user_name.text='';
@@ -146,6 +153,7 @@ class _InvoiceState extends State<Invoice> {
                   child: TextField(
                     keyboardType: TextInputType.number,
                     controller: invoice_no,
+
                     decoration: const InputDecoration(
                         hintText: "Invoice क्रमांक",
                         labelText: "Invoice क्रमांक",
@@ -182,23 +190,34 @@ class _InvoiceState extends State<Invoice> {
                         border: OutlineInputBorder()),
                   ),
                 ),
-                Padding(padding: const EdgeInsets.only(
-                    left: 8.0, right: 8.0, top: 15.0, bottom: 4.0),
-                   child: ElevatedButton(
-                  onPressed: () {
-                    showDatePicker(context: context,
-                        initialDate: _dateTime,
-                        firstDate: DateTime(2021),
-                        lastDate: DateTime(2034)
-                    ).then((date) => {
-                      setState(() {
-                        _dateTime = date!;
-                      })
-                    });
-                  },
-                  child: Text('तारीख बदला ( Change Date )'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 8.0, right: 8.0, top: 15.0, bottom: 4.0),
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black, width: 1),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: DropdownButton(
+                        value: payment_method,
+                        items: <String>['Credit','Cash','Other']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            // enabled: true,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        icon: const Icon(Icons.arrow_drop_down),
+                        underline: const SizedBox(),
+                        alignment: Alignment.center,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            payment_method = newValue!;
+                          });
+                        }),
+                  ),
                 ),
-                )
               ],
             ))));
   }
@@ -233,13 +252,17 @@ showAlertDialog(BuildContext context) {
   );
 }
 
- Future<void> _createPDF(String BillUserName ,String BillUserAddress,String BillUserContact,String BillContentName,String BillContentValue,String invoiceNo ,String BillTotalAmount,  DateTime dateTime,String Received_Balance) async{
+ Future<void> _createPDF(String BillUserName ,String BillUserAddress,String BillUserContact,String BillContentName,String BillContentValue,String invoiceNo ,String BillTotalAmount,  DateTime dateTime,String Received_Balance,String payment_method) async{
   // Create a new PDF document.
    final PdfDocument document = PdfDocument();
    //Add page to the PDF
    final PdfPage page = document.pages.add();
    //Get page client size
    final Size pageSize = page.getClientSize();
+
+
+
+
    //Draw rectangle
    page.graphics.drawRectangle(
        bounds: Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
@@ -271,7 +294,7 @@ showAlertDialog(BuildContext context) {
    final PdfLayoutResult result = drawPDFTextElement(page, pageSize,BillTotalAmount,BillUserName,BillUserAddress,BillUserContact,invoiceNo,dateTime,fontData,image,logo);
 
    //Draw grid
-   drawGrid(page, grid, result,fontData,Received_Balance);
+   drawGrid(page, grid, result,fontData,Received_Balance,payment_method);
    //Add invoice footer
    // drawFooter(page, pageSize);
 
@@ -280,7 +303,8 @@ showAlertDialog(BuildContext context) {
    //Dispose the document.
    document.dispose();
    //Save and launch the file.
-   await saveAndLaunchFile(bytes, 'Invoice.pdf');
+   String fileName = '$invoiceNo.pdf';
+   await saveAndLaunchFile(bytes, fileName);
 
 }
 
